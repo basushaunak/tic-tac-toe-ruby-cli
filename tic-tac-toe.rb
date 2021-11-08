@@ -11,14 +11,14 @@
 class TicTacToe
   def initialize(player1, player2)
     @score = []
+    @players = []
     for a in 0..8 do
       @score.push("")
     end
-      display_score()
-			@finalscore = {player1.name => 0, player2.name => 0}
-			@players = []
-			@players.push(player1)
-			@players.push(player2)
+    display_score()
+		@finalscore = {player1.name => 0, player2.name => 0}
+		@players.push(player1)
+		@players.push(player2)
   end
 
   public
@@ -49,63 +49,57 @@ class TicTacToe
     
   def set_score(in_player, position)
     pos = position - 1
-    if in_player.length != 1
-      return -2 # Invalid player
-    end
-    player = in_player.upcase()
-    if (player != "O" && player != "X")
-      return -2 # Invalid player
-    end
-    if @score[pos] != ""
-      return -1 # Position already taken
-    end
-    @score[pos] = player
+    @score[pos] = in_player.marker
     display_score()
   end
 
   public 
 
-  def game_over()
-    if @score[0] != ""
-      var = @score[0]
-      if (@score[1] == var && @score[2] == var)
-        return var
+  def game_over?(player)
+    marker = player.marker
+    if @score[0] == marker
+      if (@score[1] == marker && @score[2] == marker)
+        update_score(player)
+        return true
       end
-      if (@score[3] == var && @score[6] == var)
-        return var
+      if (@score[3] == marker && @score[6] == marker)
+        update_score(player)
+        return true
       end
-      if (@score[4] == var && @score[8] == var)
-        return var
-      end
-    end
-    if @score[1] != ""
-      var = @score[1]
-      if (@score[4] == var && @score[7] == var)
-        return var
+      if (@score[4] == marker && @score[8] == marker)
+        update_score(player)
+        return true
       end
     end
-    if @score[2] != ""
-      var = @score[2]
-      if (@score[5] == var && @score[8] == var)
-        return var
-      end
-      if (@score[4] == var && @score[6] == var)
-        return var
+    if @score[1] == marker
+      if (@score[4] == marker && @score[7] == marker)
+        update_score(player)
+        return true
       end
     end
-    if @score[3] != ""
-      var = @score[2]
-      if (@score[4] == var && @score[5] == var)
-        return var
+    if @score[2] == marker
+      if (@score[5] == marker && @score[8] == marker)
+        update_score(player)
+        return true
+      end
+      if (@score[4] == marker && @score[6] == marker)
+        update_score(player)
+        return true
       end
     end
-    if @score[6] != ""
-      var = @score[2]
-      if (@score[7] == var && @score[8] == var)
-        return var
+    if @score[3] == marker
+      if (@score[4] == marker && @score[5] == marker)
+        update_score(player)
+        return true
       end
     end
-    return nil
+    if @score[6] == marker
+      if (@score[7] == marker && @score[8] == marker)
+        update_score(player)
+        return true
+      end
+    end
+    return false
   end
 
   def game_drawn?
@@ -126,13 +120,20 @@ class TicTacToe
 	def available_slots
 		slots = []
 		@score.each_with_index do |slot, idx|
-			if slot == ""
+			if slot == "" 
 				slots.push(idx+1)
 			end
 		end
 		return slots
   end
+
+  private
+
+  def update_score(player)
+    @finalscore[player.name] += 1
+  end
 end
+
 class Player
 	attr_reader :name, :marker
 	def initialize(name,marker)
@@ -140,6 +141,7 @@ class Player
 		@marker=marker
 	end
 end
+
 module Game
   def play
 		message = "Welcome to the game of Tic-Tac-Toe!\n"
@@ -177,24 +179,3 @@ end
 
 include Game
 Game.play
-
-
-# game = TicTacToe.new()
-# game.set_score("X",1)
-# result = game.game_over
-# puts "Result: " + result.to_s
-# game.set_score("O",2)
-# result = game.game_over
-# puts "Result: " + result.to_s
-# game.set_score("X",4)
-# result = game.game_over
-# puts "Result: " + result.to_s
-# game.set_score("O",3)
-# result = game.game_over
-# puts "Result: " + result.to_s
-# game.set_score("X",7)
-# result = game.game_over
-# puts "Result: " + result.to_s
-# game.set_score("O",5)
-# result = game.game_over
-# puts "Result: " + result.to_s
