@@ -10,36 +10,38 @@
 
 class TicTacToe
   def initialize(player1, player2)
-    @score = []
+    @grid = []
     @players = []
     for a in 0..8 do
-      @score.push("")
+      @grid.push("")
     end
-    display_score()
-		@finalscore = {player1.name => 0, player2.name => 0}
+    display_grid()
+		@score = {player1.name => 0, player2.name => 0}
 		@players.push(player1)
 		@players.push(player2)
   end
 
   public
 
-  def display_score()
+  private
+  
+  def display_grid()
     puts "-------------"
-    str = "|" + (@score[0] == "" ? " 1 " : " " + @score[0] + " ") 
-    str = str + "|" +  (@score[1] == "" ? " 2 " : " " + @score[1] + " ")
-    str = str + "|" + (@score[2] == "" ? " 3 " : " " + @score[2] + " ")
+    str = "|" + (@grid[0] == "" ? " 1 " : " " + @grid[0] + " ") 
+    str = str + "|" +  (@grid[1] == "" ? " 2 " : " " + @grid[1] + " ")
+    str = str + "|" + (@grid[2] == "" ? " 3 " : " " + @grid[2] + " ")
     str = str + "|"
     puts str
     puts "|-----------|"
-    str = "|" + (@score[3] == "" ? " 4 " : " " + @score[3] + " ")
-    str = str + "|" + (@score[4] == "" ? " 5 " : " " + @score[4] + " ")
-    str = str + "|" + (@score[5] ==  "" ? " 6 " : " " + @score[5] + " ")
+    str = "|" + (@grid[3] == "" ? " 4 " : " " + @grid[3] + " ")
+    str = str + "|" + (@grid[4] == "" ? " 5 " : " " + @grid[4] + " ")
+    str = str + "|" + (@grid[5] ==  "" ? " 6 " : " " + @grid[5] + " ")
     str = str + "|"
     puts str
     puts "|-----------|"
-    str = "|" + (@score[6] == "" ? " 7 " : " " + @score[6] + " ")
-    str = str + "|" + (@score[7] == "" ? " 8 " : " " + @score[7] + " ")
-    str = str + "|" + (@score[8] == "" ? " 9 " : " " + @score[8] + " ")
+    str = "|" + (@grid[6] == "" ? " 7 " : " " + @grid[6] + " ")
+    str = str + "|" + (@grid[7] == "" ? " 8 " : " " + @grid[7] + " ")
+    str = str + "|" + (@grid[8] == "" ? " 9 " : " " + @grid[8] + " ")
     str = str + "|"
     puts str
     puts "-------------"
@@ -47,79 +49,84 @@ class TicTacToe
 
   public
     
-  def set_score(in_player, position)
+  def set_grid(in_player, position)
     pos = position - 1
-    @score[pos] = in_player.marker
-    display_score()
+    @grid[pos] = in_player.marker
+    display_grid()
   end
 
-  public 
+  private 
 
-  def game_over?(player)
+  def over?(player)
     marker = player.marker
-    if @score[0] == marker
-      if (@score[1] == marker && @score[2] == marker)
+    if @grid[0] == marker
+      if (@grid[1] == marker && @grid[2] == marker)
         update_score(player)
         return true
       end
-      if (@score[3] == marker && @score[6] == marker)
+      if (@grid[3] == marker && @grid[6] == marker)
         update_score(player)
         return true
       end
-      if (@score[4] == marker && @score[8] == marker)
-        update_score(player)
-        return true
-      end
-    end
-    if @score[1] == marker
-      if (@score[4] == marker && @score[7] == marker)
+      if (@grid[4] == marker && @grid[8] == marker)
         update_score(player)
         return true
       end
     end
-    if @score[2] == marker
-      if (@score[5] == marker && @score[8] == marker)
-        update_score(player)
-        return true
-      end
-      if (@score[4] == marker && @score[6] == marker)
+    if @grid[1] == marker
+      if (@grid[4] == marker && @grid[7] == marker)
         update_score(player)
         return true
       end
     end
-    if @score[3] == marker
-      if (@score[4] == marker && @score[5] == marker)
+    if @grid[2] == marker
+      if (@grid[5] == marker && @grid[8] == marker)
+        update_score(player)
+        return true
+      end
+      if (@grid[4] == marker && @grid[6] == marker)
         update_score(player)
         return true
       end
     end
-    if @score[6] == marker
-      if (@score[7] == marker && @score[8] == marker)
+    if @grid[3] == marker
+      if (@grid[4] == marker && @grid[5] == marker)
+        update_score(player)
+        return true
+      end
+    end
+    if @grid[6] == marker
+      if (@grid[7] == marker && @grid[8] == marker)
         update_score(player)
         return true
       end
     end
     return false
   end
-
-  def game_drawn?
-    if game_over = nil && empty_count = 0
+  
+  public
+  
+  def drawn?
+    if over?() ==true && empty_count == 0
       return true
     end
 		# Work pending here
   end
-
+  public
+  
   def empty_count
     ctr = 0
-    @score.each do |marked|
+    @grid.each do |marked|
       ctr += 1
     end
     return ctr
   end
 
-	def available_slots
+  public
+
+	def free_slots
 		slots = []
-		@score.each_with_index do |slot, idx|
+		@grid.each_with_index do |slot, idx|
 			if slot == "" 
 				slots.push(idx+1)
 			end
@@ -130,9 +137,16 @@ class TicTacToe
   private
 
   def update_score(player)
-    @finalscore[player.name] += 1
+    @score[player.name] += 1
+  end
+
+  public
+
+  def return_score()
+    return @score
   end
 end
+
 
 class Player
 	attr_reader :name, :marker
@@ -140,6 +154,28 @@ class Player
 		@name=name
 		@marker=marker
 	end
+
+  public
+
+  def make_move(game)
+    slots = game.free_slots()
+    pos = 0
+    print "#{@name}, enter a grid position [#{slots.join("/")}]: "
+    pos = gets.chomp()
+    while slots.include?(pos) != true
+      print "Invalid choice, select from #{slots.join("/")}: "
+      pos = gets.chomp()
+    end
+    game.set_grid(self,pos)
+    if game.over?()
+      puts "Woo Hoo! #{@name} won!"
+      return true
+    end
+    if game.drawn?()
+      puts "Game drawn!"
+      return true
+    end
+  end
 end
 
 module Game
@@ -164,16 +200,22 @@ module Game
 			player2_name = gets.chomp()
 		end
 		player2_marker = player1_marker == "X" ? "O" : "X"
+    puts "**************************************************"
 		puts "Player 1: #{player1_name}. Marker: #{player1_marker}"
 		puts "Player 1: #{player2_name}. Marker: #{player2_marker}"
+    puts "**************************************************"
 		player1 = Player.new(player1_name, player1_marker)
 		player2 = Player.new(player2_name, player2_marker)
-		p player1
-		puts ""
-		p player2
-		puts ""
 		game = TicTacToe.new(player1, player2)
-		puts game.available_slots.join("/") + ": "
+    answer = "C"
+    while answer == "C"
+      while ((game.drawn? != true) && (game.over? != true)) do
+        player1.make_move(game)
+        player2.make_move(game)
+      end
+      print "Type C & press 'Enter' to play another game: "
+      answer = gets.chomp.upcase
+    end
   end
 end
 
