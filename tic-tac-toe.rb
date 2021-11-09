@@ -117,21 +117,26 @@ class TicTacToe
   public
   
   def drawn?
-    if empty_count() == 0
-      @game_on = false
-      return true
+    # Possible grid positions which should have same markers for a win
+    sequences = []
+    sequences.push([@slots[0],@slots[1],@slots[2]])
+    sequences.push([@slots[0],@slots[3],@slots[6]])
+    sequences.push([@slots[0],@slots[4],@slots[8]])
+    sequences.push([@slots[1],@slots[4],@slots[7]])
+    sequences.push([@slots[2],@slots[5],@slots[8]])
+    sequences.push([@slots[2],@slots[4],@slots[6]])
+    sequences.push([@slots[3],@slots[4],@slots[5]])
+    sequences.push([@slots[6],@slots[7],@slots[8]])
+    draw = true
+    sequences.each do |sequence|
+      x_possible = (item_couter(sequence,"X") + item_couter(sequence,"") == 3) # X can win (enough empty positions)
+      o_possible = (item_couter(sequence,"O") + item_couter(sequence,"") == 3) # O can win (enough empty positions)
+      if (x_possible || o_possible)
+        draw = false
+        break
+      end
     end
-		# Work pending here
-  end
-
-  public
-  
-  def empty_count
-    ctr = 0
-    @grid.each do |marked|
-      ctr += 1
-    end
-    return ctr
+    return draw
   end
 
   public
@@ -152,6 +157,18 @@ class TicTacToe
     @score[player.name] += 1
   end
 
+  private
+
+  def item_couter(items, marker)
+    ctr = 0
+    items.each do |item|
+      if item == marker
+        ctr = ctr+1
+      end
+    end
+    return ctr
+  end
+
   public
 
   def return_score()
@@ -168,7 +185,6 @@ class TicTacToe
     display_grid()
   end
 end
-
 
 class Player
 	attr_reader :name, :marker
