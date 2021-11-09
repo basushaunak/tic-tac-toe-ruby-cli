@@ -9,6 +9,7 @@
 #            -------------
 
 class TicTacToe
+  attr_reader :game_on
   def initialize(player1, player2)
     @grid = []
     @players = []
@@ -19,6 +20,7 @@ class TicTacToe
 		@score = {player1.name => 0, player2.name => 0}
 		@players.push(player1)
 		@players.push(player2)
+    @game_on = true
   end
 
   public
@@ -55,49 +57,57 @@ class TicTacToe
     display_grid()
   end
 
-  private 
+  public 
 
   def over?(player)
     marker = player.marker
     if @grid[0] == marker
       if (@grid[1] == marker && @grid[2] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
       if (@grid[3] == marker && @grid[6] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
       if (@grid[4] == marker && @grid[8] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
     end
     if @grid[1] == marker
       if (@grid[4] == marker && @grid[7] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
     end
     if @grid[2] == marker
       if (@grid[5] == marker && @grid[8] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
       if (@grid[4] == marker && @grid[6] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
     end
     if @grid[3] == marker
       if (@grid[4] == marker && @grid[5] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
     end
     if @grid[6] == marker
       if (@grid[7] == marker && @grid[8] == marker)
         update_score(player)
+        @game_on = false
         return true
       end
     end
@@ -107,11 +117,13 @@ class TicTacToe
   public
   
   def drawn?
-    if over?() ==true && empty_count == 0
+    if empty_count() == 0
+      @game_on = false
       return true
     end
 		# Work pending here
   end
+
   public
   
   def empty_count
@@ -145,6 +157,16 @@ class TicTacToe
   def return_score()
     return @score
   end
+
+  public
+
+  def next_game()
+    for a in 0..8 do
+      @grid[a] = ""
+    end
+    @game_on = true
+    display_grid()
+  end
 end
 
 
@@ -161,13 +183,13 @@ class Player
     slots = game.free_slots()
     pos = 0
     print "#{@name}, enter a grid position [#{slots.join("/")}]: "
-    pos = gets.chomp()
+    pos = gets.chomp().to_i
     while slots.include?(pos) != true
       print "Invalid choice, select from #{slots.join("/")}: "
-      pos = gets.chomp()
+      pos = gets.chomp.to_i
     end
-    game.set_grid(self,pos)
-    if game.over?()
+    game.set_grid(self, pos)
+    if game.over?(self)
       puts "Woo Hoo! #{@name} won!"
       return true
     end
@@ -209,13 +231,24 @@ module Game
 		game = TicTacToe.new(player1, player2)
     answer = "C"
     while answer == "C"
-      while ((game.drawn? != true) && (game.over? != true)) do
+      while game.game_on() do
         player1.make_move(game)
-        player2.make_move(game)
+        if game.game_on()
+          player2.make_move(game)
+        end
       end
+      game.next_game()
       print "Type C & press 'Enter' to play another game: "
       answer = gets.chomp.upcase
     end
+    final_score = game.return_score()
+    puts "***********************"
+    puts """""""FINAL SCORE******"
+    puts "***********************"
+    final_score.each do |key,value|
+      puts "#{key}\t\t#{value}"
+    end
+    puts "***********************"
   end
 end
 
